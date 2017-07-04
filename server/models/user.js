@@ -36,11 +36,11 @@ const _ = require('lodash');
         var user = this;
         var userObject = user.toObject()
 
-        return _.pick(userObject, ['_id', 'email']);
+        return _.pick(userObject, ['_id', 'email']); //The id and email is picked and sent back.
     }
 
     UserSchema.methods.generateAuthToken = function () {
-        var user = this;
+        var user = this; //this points to whatever user created it.
         var access = 'auth';
         var token = jwt.sign({_id: user._id.toHexString(), access}, 'abc123').toString();
 
@@ -50,7 +50,26 @@ const _ = require('lodash');
             return token;
         });
     };
+
+    //These two methods above are instance methods
     
+    UserSchema.statics.findByToken = function (token) {  //Model method
+        var User = this; //The entire model
+        var decoded;
+
+        try {
+            decoded = jwt.verify(token, 'abc123');
+        } catch (e){
+            return Promise.reject(); //Easier way to reject, and we can pass a value in 
+        }
+
+       return User.findOne({   //returns a callback which we use in server.js
+           '_id': decoded._id,
+           'tokens.token': token,
+           'tokens.access': 'auth'
+           
+       })
+    };
 
     var User = mongoose.model('User', UserSchema);
 module.exports = {User};

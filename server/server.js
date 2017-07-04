@@ -9,7 +9,7 @@ const {ObjectID} = require('mongodb');
 var { mongoose } = require('./db/mongoose.js');
 var { Todo } = require('./models/todo');
 var { User } = require('./models/user');
-
+var { authenticate } = require('./middleware/authenticate');
 
 var app = express();
 const PORT = process.env.PORT;
@@ -113,6 +113,12 @@ app.patch('/todos/:id', (req, res) => {
             res.status(400).send(error);
     })
 
+});
+
+
+
+app.get('/users/me', authenticate, (req, res) => { //Private route
+    res.send(req.user);
 });
 
 
