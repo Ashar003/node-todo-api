@@ -52,7 +52,18 @@ const bcrypt = require('bcryptjs');
         });
     };
 
-    //These two methods above are instance methods
+    UserSchema.methods.removeToken = function (token) { //instance method
+        var user = this; 
+
+        return user.update({
+            $pull: {
+                tokens: {token}
+            }
+        });
+        //$pull lets us remove items from array that match a criteria
+    }
+
+    //These three methods above are instance methods
     
     UserSchema.statics.findByToken = function (token) {  //Model method
         var User = this; //The entire model
